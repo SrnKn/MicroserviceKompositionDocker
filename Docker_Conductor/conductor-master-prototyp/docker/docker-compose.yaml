@@ -1,0 +1,100 @@
+# Docker compose for netflix conductor + elasticsearch + redis
+version: '2'
+
+services:
+  conductor-server:
+    environment:
+      - CONFIG_PROP=config.properties
+    image: conductor:server
+    restart: on-failure
+    build:
+      context: ../
+      dockerfile: docker/server/Dockerfile
+    ports:
+      - 8080-8081:8080
+    depends_on:
+      - redis
+      - elasticsearch
+      - eureka
+    networks:
+          my-net:
+             aliases:
+                - conductor-server
+
+  conductor-ui:
+    environment:
+      - WF_SERVER=http://conductor-server:8080/api/
+    image: conductor:ui
+    restart: on-failure
+    build:
+      context: ../
+      dockerfile: docker/ui/Dockerfile
+    ports:
+      - 5000:5000
+    networks:
+      - my-net
+
+  redis:
+    image: redis:latest
+    restart: on-failure
+    networks:
+          my-net:
+             aliases:
+                - redis
+
+  elasticsearch:
+    image: elasticsearch:2.4
+    restart: on-failure
+    networks:
+          my-net:
+             aliases:
+                - es
+
+  eureka:
+   image: netflix:eureka
+   restart: on-failure
+   build:
+      context: ./eureka/
+      dockerfile: Dockerfile
+   ports:
+    - 8761:8761
+   networks:
+       my-net:
+          aliases:
+             - eureka
+
+  timeseriesservice:
+    restart: on-failure
+    depends_on:
+      - conductor-server
+    build: ./services/TimeseriesService
+    networks:
+         - my-net
+
+  formattingservice:
+    restart: on-failure
+    depends_on:
+      - conductor-server
+    build: ./services/FormattingService
+    networks:
+      - my-net
+
+  meteringservice:
+    restart: on-failure
+    depends_on:
+      - conductor-server
+    build: ./services/MeteringService
+    networks:
+      - my-net
+
+  ecpconnectservice:
+    restart: on-failure
+    depends_on:
+      - conductor-server
+    build: ./services/ECPConnectService
+    networks:
+      - my-net
+
+networks:
+  my-net:
+    driver: bridge

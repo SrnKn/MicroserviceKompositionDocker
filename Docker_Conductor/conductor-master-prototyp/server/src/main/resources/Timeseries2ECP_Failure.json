@@ -1,0 +1,16 @@
+{
+  "createTime": 1524643105592,
+  "name": "Timeseries2ECP_Failure",
+  "description": "Failure Workflow",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "Notify Admin",
+      "taskReferenceName": "notifyAdmin",
+      "description": "Send Notification to the Admin",
+      "type": "SIMPLE",
+      "startDelay": 0
+    }
+  ],
+  "schemaVersion": 2
+}

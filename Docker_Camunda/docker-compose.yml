@@ -1,0 +1,83 @@
+version: '2.0'
+
+services:
+    timeseriesservice:
+        build: ./TimeseriesService
+        restart: on-failure
+        ports:
+          - 7777:7777
+        depends_on:
+          - kafka
+          - mysql
+          - eureka
+          - ecpconnectservice
+        networks:
+            - my-net
+
+    formattingservice:
+        build: ./FormattingService
+        restart: on-failure
+        depends_on:
+          - kafka
+          - eureka
+        networks:
+            - my-net
+
+    meteringservice:
+        build: ./MeteringService
+        restart: on-failure
+        depends_on:
+          - kafka
+          - eureka
+        networks:
+            - my-net
+
+    ecpconnectservice:
+        build: ./ECPConnectService
+        restart: on-failure
+        ports:
+          - 7779:7779
+        depends_on:
+          - kafka
+          - eureka
+        networks:
+            - my-net
+
+    kafka:
+        image: johnnypark/kafka-zookeeper
+        restart: on-failure
+        networks:
+          my-net:
+              aliases:
+                 - kafka
+
+    mysql:
+        image: mysql:5.7.22
+        restart: on-failure
+        ports:
+          - 3307:3306
+        environment:
+           MYSQL_ROOT_PASSWORD: demo
+           MYSQL_DATABASE: camunda
+           MYSQL_USER: camunda
+           MYSQL_PASSWORD: demo
+        networks:
+          my-net:
+             aliases:
+                - mysql
+
+    eureka:
+        image: netflix:eureka
+        restart: on-failure
+        build:
+          context: ./eureka/
+          dockerfile: Dockerfile
+        ports:
+          - 8761:8761
+        networks:
+           my-net:
+             aliases:
+               - eureka
+networks:
+  my-net:
+    driver: bridge

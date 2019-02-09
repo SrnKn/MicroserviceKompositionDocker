@@ -1,0 +1,29 @@
+{
+  "name": "Remove & Reschedule Timeseries",
+  "description": "Compensation if Send to ECP is not successfully",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "Remove Timeseries",
+      "taskReferenceName": "remove",
+      "description": "Remove timeseries",
+      "inputParameters": {
+        "ts": "${workflow.input.ts}"
+      },
+      "type": "SIMPLE",
+      "startDelay": 0
+    },
+    {
+      "name": "Reschedule Timeseries",
+      "taskReferenceName": "reschedule",
+      "description": "Reschedule this Timeseries for the next Execution",
+      "inputParameters": {
+        "from": "${workflow.input.from}"
+      },
+      "type": "SIMPLE",
+      "startDelay": 0
+    }
+  ],
+  "failureWorkflow": "Timeseries2ECP_Failure",
+  "schemaVersion": 2
+}

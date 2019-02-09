@@ -1,0 +1,132 @@
+{
+  "name": "Timeseries2ECP",
+  "description": "Workflow which describes the Process of sending a Timeseries to the ECP",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "Get Timeseries data",
+      "taskReferenceName": "metering",
+      "description": "Calls the Metering Service for new timeseries data",
+      "inputParameters": {
+        "from": "${workflow.input.from}",
+        "to": "${workflow.input.to}"
+      },
+      "type": "SIMPLE",
+      "startDelay": 0
+    },
+    {
+      "name": "new Data ?",
+      "taskReferenceName": "newData",
+      "inputParameters": {
+        "newData": "${metering.output.ts}"
+      },
+      "type": "DECISION",
+      "caseExpression": "if ($.newData != null) '1'; else '0';",
+      "decisionCases": {
+        "1": [
+          {
+            "name": "Format Timeseries",
+            "taskReferenceName": "format",
+            "description": "Formats the timeseries",
+            "inputParameters": {
+              "ts": "${metering.output.ts}"
+            },
+            "type": "SIMPLE",
+            "startDelay": 0
+          },
+          {
+            "name": "Fork",
+            "taskReferenceName": "fork",
+            "type": "FORK_JOIN",
+            "forkTasks": [
+              [
+                {
+                  "name": "Save Timeseries",
+                  "taskReferenceName": "save",
+                  "description": "Save the formatted timeseries",
+                  "inputParameters": {
+                    "ts": "${format.output.ts}"
+                  },
+                  "type": "SIMPLE",
+                  "startDelay": 0
+                }
+              ],
+              [
+                {
+                  "name": "Send to ECP",
+                  "taskReferenceName": "sendECP",
+                  "description": "Sends the Request to the ECP, if it fails an admin will be notified",
+                  "inputParameters": {
+                    "ts": "${format.output.ts}"
+                  },
+                  "type": "SUB_WORKFLOW",
+                  "startDelay": 0,
+                  "subWorkflowParam": {
+                    "name": "Send to ECP",
+                    "version": 1
+                  }
+                }
+              ]
+            ],
+            "startDelay": 0
+          },
+          {
+            "name": "join",
+            "taskReferenceName": "join2",
+            "type": "JOIN",
+            "startDelay": 0,
+            "joinOn": [
+              "sendECP",
+              "save"
+            ]
+          },
+          {
+            "name": "Send to ECP successfully?",
+            "taskReferenceName": "Send to ECP successfully?",
+            "inputParameters": {
+              "success": "${sendECP.output.success}"
+            },
+            "type": "DECISION",
+            "caseValueParam": "success",
+            "decisionCases": {
+              "1": [
+                {
+                  "name": "Update Timeseries",
+                  "taskReferenceName": "update",
+                  "description": "Updates the formatted timeseries",
+                  "inputParameters": {
+                    "ts": "${format.output.ts}",
+                    "response": "${sendECP.output.response}"
+                  },
+                  "type": "SIMPLE",
+                  "startDelay": 0
+                }
+              ]
+            },
+            "defaultCase": [
+              {
+                "name": "Remove & Reschedule Timeseries",
+                "taskReferenceName": "Remove&Reschedule",
+                "description": "Compensation if send to ECP is not successfull",
+                "inputParameters": {
+                  "ts": "${format.output.ts}",
+                  "from": "${workflow.input.from}"
+                },
+                "type": "SUB_WORKFLOW",
+                "startDelay": 0,
+                "subWorkflowParam": {
+                  "name": "Remove & Reschedule Timeseries",
+                  "version": 1
+                }
+              }
+            ],
+            "startDelay": 0
+          }
+        ]
+      },
+      "startDelay": 0
+    }
+  ],
+  "failureWorkflow": "TimeseriesToECP_Sub_Failure",
+  "schemaVersion": 2
+}

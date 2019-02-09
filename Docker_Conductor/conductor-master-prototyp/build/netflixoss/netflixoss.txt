@@ -1,0 +1,11 @@
+com.netflix.conductor:conductor-client:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-common:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-contribs:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-core:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-es5-persistence:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-jersey:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-mysql-persistence:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-redis-persistence:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-server:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-test-harness:0.1.0-dev.0.uncommitted
+com.netflix.conductor:conductor-ui:0.1.0-dev.0.uncommitted

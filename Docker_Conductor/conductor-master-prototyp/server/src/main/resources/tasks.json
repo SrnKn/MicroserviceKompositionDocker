@@ -1,0 +1,146 @@
+[
+  {
+    "updateTime": 1526035131335,
+    "name": "Remove Timeseries",
+    "retryCount": 5,
+    "timeoutSeconds": 360,
+    "inputKeys": [
+      "ts"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035147544,
+    "name": "Send to ECP",
+    "retryCount": 5,
+    "timeoutSeconds": 3600,
+    "inputKeys": [
+      "ts"
+    ],
+    "outputKeys": [
+      "correlationId"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035141463,
+    "name": "Save Timeseries",
+    "retryCount": 5,
+    "timeoutSeconds": 360,
+    "inputKeys": [
+      "ts"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035158925,
+    "name": "Poll for ECP Response",
+    "retryCount": 0,
+    "timeoutSeconds": 3600,
+    "inputKeys": [
+      "correlationId"
+    ],
+    "outputKeys": [
+      "response"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035165692,
+    "name": "Notify Admin",
+    "retryCount": 5,
+    "timeoutSeconds": 360,
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035178100,
+    "name": "Format Timeseries",
+    "retryCount": 5,
+    "timeoutSeconds": 360,
+    "inputKeys": [
+      "ts"
+    ],
+    "outputKeys": [
+      "ts"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035188976,
+    "name": "Handle ECP Response",
+    "retryCount": 3,
+    "timeoutSeconds": 360,
+    "inputKeys": [
+      "response"
+    ],
+    "outputKeys": [
+      "success"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035203126,
+    "name": "Get Timeseries data",
+    "retryCount": 5,
+    "timeoutSeconds": 360,
+    "inputKeys": [
+      "from",
+      "to"
+    ],
+    "outputKeys": [
+      "ts"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035222359,
+    "name": "Reschedule Timeseries",
+    "retryCount": 5,
+    "timeoutSeconds": 360,
+    "inputKeys": [
+      "from"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  },
+  {
+    "updateTime": 1526035230381,
+    "name": "Update Timeseries",
+    "retryCount": 5,
+    "timeoutSeconds": 360,
+    "inputKeys": [
+      "ts",
+      "response"
+    ],
+    "timeoutPolicy": "RETRY",
+    "retryLogic": "EXPONENTIAL_BACKOFF",
+    "retryDelaySeconds": 180,
+    "responseTimeoutSeconds": 0
+  }
+]

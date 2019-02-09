@@ -1,0 +1,113 @@
+{
+  "name": "Send to ECP",
+  "description": "Send to ECP",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "Send to ECP",
+      "taskReferenceName": "sendECP",
+      "description": "Sends the Request to the ECP",
+      "inputParameters": {
+        "ts": "${workflow.input.ts}"
+      },
+      "type": "SIMPLE",
+      "startDelay": 0,
+      "optional": true
+    },
+    {
+      "name": "status?",
+      "taskReferenceName": "status",
+      "inputParameters": {
+        "status": "${sendECP.status}"
+      },
+      "type": "DECISION",
+      "caseValueParam": "status",
+      "decisionCases": {
+        "COMPLETED": [
+          {
+            "name": "Poll for ECP Response",
+            "taskReferenceName": "responseECP",
+            "description": "Polls the ECP for the response",
+            "inputParameters": {
+              "correlationId": "${sendECP.output.correlationId}"
+            },
+            "type": "SIMPLE",
+            "startDelay": 0,
+            "optional": true
+          },
+          {
+            "name": "status?",
+            "taskReferenceName": "status2",
+            "inputParameters": {
+              "status": "${responseECP.status}"
+            },
+            "type": "DECISION",
+            "caseValueParam": "status",
+            "decisionCases": {
+              "COMPLETED": [
+                {
+                  "name": "Handle ECP Response",
+                  "taskReferenceName": "handleResponseECP",
+                  "description": "Handles the ECP Response",
+                  "inputParameters": {
+                    "response": "${responseECP.output.response}"
+                  },
+                  "type": "SIMPLE",
+                  "startDelay": 0
+                },
+                {
+                  "name": "status?",
+                  "taskReferenceName": "status3",
+                  "inputParameters": {
+                    "status": "${handleResponseECP.status}",
+                    "success": "${handleResponseECP.output.success}"
+                  },
+                  "type": "DECISION",
+                  "caseExpression": "if ($.status == 'COMPLETED' && $.success ==1) '1'; else '0';",
+                  "decisionCases": {
+                    "0": [
+                      {
+                        "name": "Notify Admin",
+                        "taskReferenceName": "notifyAdmin1",
+                        "description": "Send Notification to the Admin",
+                        "type": "SIMPLE",
+                        "startDelay": 0
+                      }
+                    ]
+                  },
+                  "startDelay": 0
+                }
+              ]
+            },
+            "defaultCase": [
+              {
+                "name": "Notify Admin",
+                "taskReferenceName": "notifyAdmin1",
+                "description": "Send Notification to the Admin",
+                "type": "SIMPLE",
+                "startDelay": 0
+              }
+            ],
+            "startDelay": 0
+          }
+        ]
+      },
+      "defaultCase": [
+        {
+          "name": "Notify Admin",
+          "taskReferenceName": "notifyAdmin1",
+          "description": "Send Notification to the Admin",
+          "type": "SIMPLE",
+          "startDelay": 0
+        }
+      ],
+      "startDelay": 0
+    }
+  ],
+  "outputParameters": {
+    "success": "${handleResponseECP.output.success}",
+    "response": "${responseECP.output.response}"
+  },
+  "failureWorkflow": "Timeseries2ECP_Failure",
+  "schemaVersion": 2
+}
